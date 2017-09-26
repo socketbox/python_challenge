@@ -9,9 +9,12 @@ XFORCE_API_IP_REP = 'ipr'
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-x', '--xforce', required=True, type=argparse.FileType('r'), help='Path to a file containing '
-                                                                                           'your X-Force credentials.')
-    parser.add_argument('address', nargs='?', help='An IP address to be checked via X-Force')
+    parser.add_argument('api_authN_file', type=argparse.FileType('r'),
+                        help='Path to a file containing your X-Force credentials, key and password on first and second '
+                             'lines, respectively.')
+    parser.add_argument('address', nargs='?', metavar='ip_address', help='An IP address to be checked via X-Force. If '
+                                                                         'the IP address is omitted or invalid, the '
+                                                                         'user will be prompted for one.')
     return parser.parse_args()
 
 
@@ -55,9 +58,12 @@ def main():
     url = "{}/{}/{}".format(XFORCE_API_BASE, XFORCE_API_IP_REP, ip)
 
     # get X-Force API keys
-    creds = read_in_xforce_keys(args.xforce)
+    creds = read_in_xforce_keys(args.api_authN_file)
     result = requests.get(url, auth=(creds[0], creds[1]))
+    # maybe user swapped key and password in api creds file?
+    # if result.status_code == '401':
     pprint.pprint(result.json())
+
     return 0
 
 
