@@ -16,8 +16,9 @@ import pprint
 import argparse
 import requests
 import IPy
-import http.server
-import socketserver
+import web.webui
+import cherrypy
+
 
 XFORCE_API_BASE = 'https://api.xforce.ibmcloud.com'
 XFORCE_API_IP_REP = 'ipr'
@@ -147,7 +148,7 @@ def call_xforce_api(address_list, key, password):
     """
     results = []
     for a in address_list:
-        url = "{}/{}/{}".format(XFORCE_API_BASE, XFORCE_API_IP_REP, a)
+        url = "{}/{}/{}".foGrmat(XFORCE_API_BASE, XFORCE_API_IP_REP, a)
         results.append(requests.get(url, auth=(key, password)).json())
     return results
 
@@ -179,12 +180,9 @@ def print_json_file(results, file):
         file.write('######################################\n')
 
 
-def start_server(ip_address="127.0.0.1", port=8000):
-    # we want to serve out of the web directory
-    handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer((ip_address, port), handler) as httpd:
-        print("Starting HTTP server on port {0}".format(port))
-        httpd.serve_forever()
+def start_server(address='127.0.0.1', port=8000):
+    webapp = web.webui.XforceForm(address, port)
+    cherrypy.quickstart(webapp, '/', './web/server.cfg')
 
 
 def main():

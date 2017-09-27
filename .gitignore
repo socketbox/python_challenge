@@ -4,4 +4,5 @@ out
 *.out
 gen
 test/xforce.cfg
+notes.txt
 
