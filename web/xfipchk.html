@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>X-Force IP Check</title>
+    <script src="jquery.js"></script>
+    <script src="jquery.validate.js"></script>
+    <link rel="stylesheet" type="text/css" href="xfipchk.css"/>
+    :w
+</head>
+<body>
+<div id="column">
+    <form id="the-form">
+        <div>
+            <p><span>Instructions:</span>
+            <ol>
+                <li>Paste your IBM X-Force API key and password into the corresponding fields.</li>
+                <li>Enter IP addresses in the box labeled accordingly. They may be delimited by commas or newlines.</li>
+                <li>Press the Submit button to call the API.</li>
+            </ol>
+            </p>
+            <label for="api-key">X-Force API Key</label>
+            <input type="text" autofocus required class="api-cred" name="api-key" id="api-key" title="api-key"
+                   placeholder="01234567-9abc-def0-1234-56789abcdef0"/>
+            <label for="api-password">X-Force API Password</label>
+            <input type="text" class="api-cred" required name="api-password" id="api-password" title="api-password"
+                   placeholder="01234567-9abc-def0-1234-56789abcdef0"/>
+        </div>
+        <div>
+            <label for="ip-addresses">IP Addresses</label>
+            <input type="textarea" class="ip-addresses" id="ip-addresses"/>
+        </div>
+        <script>
+                $("the-form").validate();
+
+
+        </script>
+    </form>
+</div>
+</body>
+</html>

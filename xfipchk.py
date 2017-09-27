@@ -9,12 +9,15 @@ method of IBM's X-Force API to retrieve data describing the address's reputation
 
 """
 
+import os
 import sys
 import re
 import pprint
 import argparse
 import requests
 import IPy
+import http.server
+import socketserver
 
 XFORCE_API_BASE = 'https://api.xforce.ibmcloud.com'
 XFORCE_API_IP_REP = 'ipr'
@@ -28,19 +31,31 @@ def parse_args():
     :return: a Namespace object of parsed arguments
     """
     parser = argparse.ArgumentParser(description="Use the X-Force API to check IP address reputation.")
-    parser.add_argument('-o', '--out', metavar='output_file',
+    subparsers = parser.add_subparsers(help="Mutually exclusive sub-commands")
+
+    cli_parser = subparsers.add_parser('cli', help="Command-line Interface; run 'xfipchk cli -h' to see options")
+    cli_parser.add_argument('-o', '--out', metavar='output_file',
                         type=argparse.FileType('w'), help="Write result of X-Force call to file.")
-    parser.add_argument('authN', type=argparse.FileType('r'),
-                        help='Path to a file containing your X-Force credentials, key and password on first and second '
+    cli_parser.add_argument('authN', type=argparse.FileType('r'),
+                            help='Path to a file containing your X-Force credentials, key and password on first and second '
                              'lines, respectively.')
 
     # user should not be able to specify both IP on cmdline and in a file
-    ip_group = parser.add_mutually_exclusive_group()
+    ip_group = cli_parser.add_mutually_exclusive_group()
     # TODO: nargs='N' and loop through list
-    ip_group.add_argument('-i', '--ip', nargs='?', metavar='ip_address', help='An IP address to be checked via '
-                                                                              'X-Force. If the IP address is omitted or invalid, the user will be prompted for one.')
+    ip_group.add_argument('-i', '--ip', metavar='ip_address', help='An IP address to be checked via X-Force. If the IP'
+                                                                   'address is omitted or invalid, the user will be '
+                                                                   'prompted for one.')
     ip_group.add_argument('-I', '--Ips', type=argparse.FileType('r'), metavar='file_of_ip_addresses',
                           help='A file containing IP addresses, one per line.')
+
+    web_parser = subparsers.add_parser('web', help="Web interface; run 'xfipchk web -h' to see options")
+    w_group = web_parser.add_argument_group(title="Web Interface", description="You may specify the address and port to"
+                                                                               " bind to; defaults are 127.0.0.1 and "
+                                                                               "8000")
+    w_group.add_argument('-p', '--port', default=8000)
+    w_group.add_argument('-a', '--address', default='127.0.0.1')
+
     return parser.parse_args()
 
 
@@ -164,27 +179,47 @@ def print_json_file(results, file):
         file.write('######################################\n')
 
 
-def main():
+def start_server(ip_address="127.0.0.1", port=8000):
+    # we want to serve out of the web directory
+    handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer((ip_address, port), handler) as httpd:
+        print("Starting HTTP server on port {0}".format(port))
+        httpd.serve_forever()
 
-    ip = None
-    addresses = list()
+
+def main():
     args = parse_args()
-    if args.Ips:
-        addresses = read_in_address_file(args.Ips)
-    else:
-        # get user-supplied IP address from the cmd line
-        if args.ip:
-            ip = validate_ip(args.ip)
-        # prompt user for valid IP in case of typo on cmdline
-        while not ip:
-            ip = request_valid_ip()
-        addresses.append(ip)
-    creds = read_in_xforce_keys(args.authN)
-    results = call_xforce_api(addresses, creds[0], creds[1])
-    if args.out:
-        print_json_file(results, args.out)
-    else:
-        print_json_stdout(results)
+    # if port is in Namespace object, assume web interface
+    if args.port:
+        # TODO: should use a context manager here
+        current = os.curdir
+        try:
+            os.chdir('./web')
+            start_server(args.address, args.port)
+        except OSError as ose:
+            print(ose.strerror)
+        finally:
+            os.chdir(current)
+
+    elif args.cli:
+        ip = None
+        addresses = list()
+        if args.Ips:
+            addresses = read_in_address_file(args.Ips)
+        else:
+            # get user-supplied IP address from the cmd line
+            if args.ip:
+                ip = validate_ip(args.ip)
+            # prompt user for valid IP in case of typo on cmdline
+            while not ip:
+                ip = request_valid_ip()
+            addresses.append(ip)
+        creds = read_in_xforce_keys(args.authN)
+        results = call_xforce_api(addresses, creds[0], creds[1])
+        if args.out:
+            print_json_file(results, args.out)
+        else:
+            print_json_stdout(results)
 
     return 0
 
