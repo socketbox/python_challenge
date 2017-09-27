@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 out
+*.out
 gen
-xforce.cfg
+test/xforce.cfg
 
