@@ -10,7 +10,7 @@
 </head>
 <body>
 <div id="column">
-    <form id="the-form">
+    <form id="the-form" action="process_form">
         <div>
             <p><span>Instructions:</span>
             <ol>
@@ -20,15 +20,15 @@
             </ol>
             </p>
             <label for="api-key">X-Force API Key</label>
-            <input type="text" autofocus required class="api-cred" name="api-key" id="api-key" title="api-key"
+            <input type="text" autofocus required class="api-cred" name="api_key" id="api-key" title="api-key"
                    placeholder="01234567-9abc-def0-1234-56789abcdef0"/>
             <label for="api-password">X-Force API Password</label>
-            <input type="text" class="api-cred" required name="api-password" id="api-password" title="api-password"
+            <input type="text" class="api-cred" required name="api_password" id="api-password" title="api-password"
                    placeholder="01234567-9abc-def0-1234-56789abcdef0"/>
         </div>
         <div>
             <label for="ip-addresses">IP Addresses</label>
-            <input type="textarea" class="ip-addresses" id="ip-addresses"/>
+            <input type="textarea" class="ip-addresses" name="ip_addresses" id="ip-addresses"/>
         </div>
         <script>
                 $("the-form").validate();

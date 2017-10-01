@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import cherrypy
-import os
-import io
-
+import xfipchk
 
 class XforceForm(object):
     def __init__(self, address='127.0.0.1', port=8000):
@@ -13,12 +11,16 @@ class XforceForm(object):
         cherrypy.config.update({'server.socket_port': port,
                                 'server.socket_host': address})
 
-    # def start_server(self):
-    #    cherrypy.quickstart(XforceForm(), '/', './web/server.cfg')
 
     @cherrypy.expose
     def index(self):
         return "/"
+
+    @cherrypy.expose()
+    def process_form(self, api_key, api_password, ip_addresses):
+        if isinstance(ip_addresses, list):
+            xfipchk.r
+        xfipchk.call_xforce_api(ip_addresses, api_key, api_password)
 
 
 if __name__ == '__main__':
