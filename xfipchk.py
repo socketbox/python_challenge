@@ -18,6 +18,7 @@ import requests
 import IPy
 import web.webui
 import cherrypy
+from cherrypy.process.plugins import PIDFile
 
 XFORCE_API_BASE = 'https://api.xforce.ibmcloud.com'
 XFORCE_API_IP_REP = 'ipr'
@@ -187,8 +188,26 @@ def print_json_file(results, file):
 
 
 def start_server(address='127.0.0.1', port=8000):
+    os.chdir('./web')
+    print("This is getcwd 1: {}".format(os.path.abspath(os.getcwd())))
+    print("This is getcwd 2: {}".format(os.getcwd()))
+    config = {'/':
+        {
+            'tools.staticdir.on': True,
+            'tools.staticdir.root': os.path.abspath(os.getcwd()),
+            'tools.staticdir.index': "xfipchk.html",
+            'tools.staticdir.dir': os.getcwd()
+        }
+    }
     webapp = web.webui.XforceForm(address, port)
-    cherrypy.quickstart(webapp, '/', './web/server.cfg')
+    d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
+    d.subscribe()
+    cherrypy.config.update(config)
+    cherrypy.tree.mount(webapp, config=config)
+    cherrypy.engine.start()
+    pidfile = tempfile.TemporaryFile(suffix='.pid')
+    PIDFile(cherrypy.engine, pidfile).subscribe()
+    cherrypy.engine.block()
 
 
 def main():
@@ -196,14 +215,12 @@ def main():
     # if port is in Namespace object, assume web interface
     if hasattr(args, 'port'):
         # TODO: should use a context manager here
-        current = os.curdir
         try:
-            os.chdir('./web')
-            start_server(args.address, args.port)
-        except OSError as ose:
+            start_server(args.address, args.port, pidfile)
+        except:
             print(ose.strerror)
         finally:
-            os.chdir(current)
+
     # assume cli if user passed in api key file
     elif hasattr(args, 'authN'):
         ip = None
