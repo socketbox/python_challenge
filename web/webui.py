@@ -21,9 +21,7 @@ class XforceForm(object):
         if xfipchk.validate_api_creds(api_key.strip()) and xfipchk.validate_api_creds(api_password.strip()):
             form_ips = []
             if isinstance(ip_addresses, str):
-                form_ips.append(ip_addresses)
-            elif isinstance(ip_addresses, list):
-                form_ips.extend(ip_addresses)
+                form_ips = ip_addresses.splitlines()
             good_ips = []
             for i in form_ips:
                 if xfipchk.validate_ip(i):
@@ -33,8 +31,26 @@ class XforceForm(object):
             return cherrypy.HTTPError("400: Bad Request", 400)
 
     @cherrypy.expose()
-    def stop_demo(self, stop_demo):
+    def stop_demo(self):
         cherrypy.engine.stop()
 
+
 if __name__ == '__main__':
-    xfipchk.start_server()
+    webapp = XforceForm('127.0.0.1', 8000)
+    #d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
+    #d.subscribe()
+    cherrypy.tree.mount(webapp, config='./server.cfg')
+
+    if hasattr(cherrypy.engine, 'signal_handler'):
+        cherrypy.engine.signal_handler.subscribe()
+
+    # Initialize console control
+    if hasattr(cherrypy.engine, "console_control_handler"):
+        cherrypy.engine.console_control_handler.subscribe()
+
+    cherrypy.engine.start()
+
+    #pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')
+    #PIDFile(cherrypy.engine, pidfile).subscribe()
+
+    cherrypy.engine.block()

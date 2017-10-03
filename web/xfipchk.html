@@ -14,14 +14,16 @@
 
             if (conf)
             {
-                $.post( "/stop_demo" )
+                $.ajax( {url: "/stop_demo"} );
             }
         }
 
         function check_ips()
         {
             var req = $.ajax({'url': '/process_form'});
-            req.done(function (data){ $( ".result" ).html( data ); }, "json");
+            req.done(function (data){
+                $.getElementById("results_div").setAttribute("hidden")
+                $( ".result" ).html( data ); }, "json");
         }
 
     </script>

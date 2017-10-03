@@ -24,8 +24,6 @@ XFORCE_API_BASE = 'https://api.xforce.ibmcloud.com'
 XFORCE_API_IP_REP = 'ipr'
 XFORCE_CRED_PATTERN = '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
-global pidfile
-
 
 def parse_args():
     """
@@ -152,7 +150,9 @@ def call_xforce_api(address_list, key, password):
     Call the ipr method of the X-Force API using the IP address(es) contained in the parameter. Results are written
     to a file or stdout (default).
 
-    :param address_list:  a list of IP addresses
+    :param address_list:    a list of IP addresses
+    :param key:             X-Force API key
+    :param password:             X-Force API password
     :return:    a list of json objects
     """
     results = []
@@ -195,33 +195,22 @@ def start_server(address='127.0.0.1', port=8000):
     webapp = web.webui.XforceForm(address, port)
     d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
     d.subscribe()
-    #cherrypy.config.update('server.cfg')
     cherrypy.tree.mount(webapp, config='./server.cfg')
-    #cherrypy.tree.mount(webapp)
     cherrypy.engine.start()
+
     pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')
     PIDFile(cherrypy.engine, pidfile).subscribe()
 
-    cherrypy.engine.subscribe('stop', cleanup(pidfile))
     cherrypy.engine.block()
-
-    return pidfile.name
-
-
-def cleanup(pid_file):
-    print(pid_file.name)
-    if os.path.exists(pid_file):
-        cherrypy.engine.stop()
 
 
 def main():
-    global pidfile
     args = parse_args()
     # if port is in Namespace object, assume web interface
     if hasattr(args, 'port'):
         # TODO: should use a context manager here
         try:
-            pidfile = start_server(args.address, args.port)
+            start_server(args.address, args.port)
         except (ConnectionError, KeyboardInterrupt) as err:
             print("Server failed to start: {}".format(err))
 
