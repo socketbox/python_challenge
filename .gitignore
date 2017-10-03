@@ -6,4 +6,4 @@ gen
 test/xforce.cfg
 notes.txt
 keys.txt
-__pycache__/*
+__pycache__

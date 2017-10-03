@@ -22,6 +22,10 @@ class XforceForm(object):
             xfipchk.r
         xfipchk.call_xforce_api(ip_addresses, api_key, api_password)
 
+    @cherrypy.expose()
+    def stop_demo(self, stop_demo):
+        cherrypy.engine.stop()
+
 
 if __name__ == '__main__':
     cherrypy.quickstart(XforceForm())

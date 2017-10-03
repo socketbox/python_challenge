@@ -1,14 +1,71 @@
 body
 {
-    background-color: #777777;
+    color: #02AAFF;
+    font-family: sans-serif;
+    position: absolute;
+    width: 800px;
+    height: 600px;
+    top: 20%;
+    left: 30%;
+    margin: -100px 0 0 -150px;
+    margin: auto;
+    background-color: #313233;
 }
 
-div#column
+.instructions
 {
-    color: #FF6100;
+    font-size: 16pt;
 }
 
-.api-cred
+li
 {
-    width: 250px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
+
+.api_cred
+{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14pt;
+    font-family: sans-serif;
+    text-color: #EEEEEE;
+    size: 36;
+    width: 350px;
+}
+
+div#textarea
+{
+    width: 100%;
+    maargin: 0 auto;
+    margin-top: 10px;
+}
+
+textarea
+{
+    width: 100%;
+    height: 10em;
+}
+
+div#std_buttons
+{
+    margin: 0 auto;
+    width: 23%;
+}
+
+div#stop_demo_button
+{
+    margin: 0 auto;
+    margin-top: 20px;
+    width: 14%;
+}
+
+button
+{
+    color: #02AAFF;
+    font-size: 14pt;
+    font-family: sans-serif;
+    background-color: #313233;
+    margin: 0 auto;
+}
+

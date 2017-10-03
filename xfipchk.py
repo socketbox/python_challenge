@@ -24,6 +24,8 @@ XFORCE_API_BASE = 'https://api.xforce.ibmcloud.com'
 XFORCE_API_IP_REP = 'ipr'
 XFORCE_CRED_PATTERN = '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
+global pidfile
+
 
 def parse_args():
     """
@@ -205,21 +207,31 @@ def start_server(address='127.0.0.1', port=8000):
     cherrypy.config.update(config)
     cherrypy.tree.mount(webapp, config=config)
     cherrypy.engine.start()
-    pidfile = tempfile.TemporaryFile(suffix='.pid')
+    pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')
     PIDFile(cherrypy.engine, pidfile).subscribe()
+
+    cherrypy.engine.subscribe('stop', cleanup(pidfile))
     cherrypy.engine.block()
+
+    return pidfile.name
+
+
+def cleanup(pid_file):
+    print(pid_file.name)
+    if os.path.exists(pid_file):
+        cherrypy.engine.stop()
 
 
 def main():
+    global pidfile
     args = parse_args()
     # if port is in Namespace object, assume web interface
     if hasattr(args, 'port'):
         # TODO: should use a context manager here
         try:
-            start_server(args.address, args.port, pidfile)
-        except:
-            print(ose.strerror)
-        finally:
+            pidfile = start_server(args.address, args.port)
+        except (ConnectionError, KeyboardInterrupt) as err:
+            print("Server failed to start: {}".format(err.strerror))
 
     # assume cli if user passed in api key file
     elif hasattr(args, 'authN'):
