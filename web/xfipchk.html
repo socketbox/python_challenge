@@ -14,24 +14,16 @@
 
             if (conf)
             {
-                $.post("/stop_demo", function(data){ alert("Data Loaded: " + data); });
+                $.post( "/stop_demo" )
             }
-                /*$.post( "/stop_demo", function() {
-
-                })
-                .success(data, status, ajaxRequestObj) function() {
-
-                .done(function() {
-                  alert( "second success" );
-                })
-                .fail(function() {
-                alert( "error" );
-                })
-                .always(function() {
-                alert( "finished" );
-                });
-            }*/
         }
+
+        function check_ips()
+        {
+            var req = $.ajax({'url': '/process_form'});
+            req.done(function (data){ $( ".result" ).html( data ); }, "json");
+        }
+
     </script>
     <link rel="stylesheet" type="text/css" href="xfipchk.css"/>
 </head>
@@ -42,7 +34,7 @@
             <p><span class="instructions">Instructions:</span></p>
             <ol>
                 <li>Paste your IBM X-Force API key and password into the corresponding fields.</li>
-                <li>Enter IP addresses in the box labeled accordingly. They must be delimited by commas or newlines.</li>
+                <li>Enter IP addresses in the box labeled accordingly, each IP address on its own line.</li>
                 <li>Press the Submit button to call the API.</li>
                 <li>Review the results.</li>
                 <li>Press the Stop Demo button to stop the demo.</li>
@@ -61,7 +53,7 @@
             <textarea class="ip_addresses" name="ip_addresses" id="ip_addresses"></textarea>
         </div>
         <div id="std_buttons">
-            <button id="submit" type="submit" form="the_form" value="submit">Submit</button> <button id="reset" type="reset" form="the_form" value="reset">Reset</button>
+            <button id="submit" form="the_form" onclick="check_ips()">Submit</button> <button id="reset" type="reset" form="the_form" value="reset">Reset</button>
         </div>
     </form>
     <form id="stop_form">

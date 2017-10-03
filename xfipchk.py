@@ -190,22 +190,14 @@ def print_json_file(results, file):
 
 
 def start_server(address='127.0.0.1', port=8000):
-    os.chdir('./web')
-    print("This is getcwd 1: {}".format(os.path.abspath(os.getcwd())))
-    print("This is getcwd 2: {}".format(os.getcwd()))
-    config = {'/':
-        {
-            'tools.staticdir.on': True,
-            'tools.staticdir.root': os.path.abspath(os.getcwd()),
-            'tools.staticdir.index': "xfipchk.html",
-            'tools.staticdir.dir': os.getcwd()
-        }
-    }
+    if not os.path.abspath(os.getcwd()).endswith("python_challenge/web"):
+        os.chdir('./web')
     webapp = web.webui.XforceForm(address, port)
     d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
     d.subscribe()
-    cherrypy.config.update(config)
-    cherrypy.tree.mount(webapp, config=config)
+    #cherrypy.config.update('server.cfg')
+    cherrypy.tree.mount(webapp, config='./server.cfg')
+    #cherrypy.tree.mount(webapp)
     cherrypy.engine.start()
     pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')
     PIDFile(cherrypy.engine, pidfile).subscribe()
@@ -231,7 +223,7 @@ def main():
         try:
             pidfile = start_server(args.address, args.port)
         except (ConnectionError, KeyboardInterrupt) as err:
-            print("Server failed to start: {}".format(err.strerror))
+            print("Server failed to start: {}".format(err))
 
     # assume cli if user passed in api key file
     elif hasattr(args, 'authN'):
