@@ -7,23 +7,13 @@
             integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
     <script>
-        function warn_stop()
-        {
-            var conf = confirm("This will stop the web server and close your browser tab/window. You will loose any"+
-             "data returned from X-Force. Proceed?" );
-
-            if (conf)
-            {
-                $.ajax( {url: "/stop_demo"} );
-            }
-        }
 
         function check_ips()
         {
             var req = $.ajax({'url': '/process_form'});
             req.done(function (data){
-                $.getElementById("results_div").setAttribute("hidden")
-                $( ".result" ).html( data ); }, "json");
+                //$.getElementById("results_div").setAttribute("hidden")
+                $( "#results" ).html( data ); }, "json");
         }
 
     </script>
@@ -56,11 +46,6 @@
         </div>
         <div id="std_buttons">
             <button id="submit" form="the_form" onclick="check_ips()">Submit</button> <button id="reset" type="reset" form="the_form" value="reset">Reset</button>
-        </div>
-    </form>
-    <form id="stop_form">
-        <div id="stop_demo_button">
-            <button name="stop_demo" form="stop_form" onclick="warn_stop()">Stop Demo</button>
         </div>
     </form>
 </div>

@@ -30,15 +30,9 @@ class XforceForm(object):
         else:
             return cherrypy.HTTPError("400: Bad Request", 400)
 
-    @cherrypy.expose()
-    def stop_demo(self):
-        cherrypy.engine.stop()
-
 
 if __name__ == '__main__':
     webapp = XforceForm('127.0.0.1', 8000)
-    #d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
-    #d.subscribe()
     cherrypy.tree.mount(webapp, config='./server.cfg')
 
     if hasattr(cherrypy.engine, 'signal_handler'):
@@ -49,8 +43,4 @@ if __name__ == '__main__':
         cherrypy.engine.console_control_handler.subscribe()
 
     cherrypy.engine.start()
-
-    #pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')
-    #PIDFile(cherrypy.engine, pidfile).subscribe()
-
     cherrypy.engine.block()

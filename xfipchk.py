@@ -193,8 +193,6 @@ def start_server(address='127.0.0.1', port=8000):
     if not os.path.abspath(os.getcwd()).endswith("python_challenge/web"):
         os.chdir('./web')
     webapp = web.webui.XforceForm(address, port)
-    d = cherrypy.process.plugins.Daemonizer(cherrypy.engine)
-    d.subscribe()
     cherrypy.tree.mount(webapp, config='./server.cfg')
     cherrypy.engine.start()
 
