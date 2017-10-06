@@ -30,7 +30,7 @@ li
     font-size: 14pt;
     font-family: sans-serif;
     text-color: #EEEEEE;
-    size: 36;
+    size: 36em;
     width: 350px;
 }
 
@@ -60,7 +60,7 @@ div#stop_demo_button
     width: 14%;
 }
 
-button
+button, input#submit
 {
     color: #02AAFF;
     font-size: 14pt;

@@ -192,8 +192,8 @@ def print_json_file(results, file):
 def start_server(address='127.0.0.1', port=8000):
     if not os.path.abspath(os.getcwd()).endswith("python_challenge/web"):
         os.chdir('./web')
-    webapp = web.webui.XforceForm(address, port)
-    cherrypy.tree.mount(webapp, config='./server.cfg')
+    cherrypy.tree.mount(web.webui.XforceForm(address, port), "", config='cpy_app.cfg')
+    #cherrypy.tree.mount(webapp, "")
     cherrypy.engine.start()
 
     pidfile = tempfile.TemporaryFile(prefix='xfipchk', suffix='.pid')

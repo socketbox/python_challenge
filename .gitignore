@@ -7,3 +7,4 @@ test/xforce.cfg
 notes.txt
 keys.txt
 __pycache__
+*.log

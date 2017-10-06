@@ -3,25 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>X-Force IP Check</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.js"
-            integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script>window.jQuery || document.write("<script src='js/jquery-3.2.1.js'><\/script>")</script>
     <script>
 
         function check_ips()
         {
-            var req = $.ajax({'url': '/process_form'});
-            req.done(function (data){
-                //$.getElementById("results_div").setAttribute("hidden")
-                $( "#results" ).html( data ); }, "json");
+            /* debugging parms */
+            $.ajax({
+                url: '/process_form',
+                method: 'POST',
+                /* contentType: 'application/x-www-form-urlencoded; charset=UTF-8', */
+                data: {
+                    "api_key": $('#api_key').val(),
+                    "api_password": $('#api_password').val(),
+                    "ip_addresses": $('#ip_addresses').val()
+                },
+                dataType: 'json',
+                success: function( data, textStatus, jqXHR)
+                {
+                    $("#ip_addresses").hide()
+                    $("#results").css("color", "#000000");
+                    $("#results").css("background-color", "#FFFFFF");
+                    $("#results").text(JSON.stringify(data[0]));
+                }
+            })
         }
 
     </script>
     <link rel="stylesheet" type="text/css" href="xfipchk.css"/>
 </head>
 <body>
+
 <div id="column">
-    <form id="the_form" action="process_form" method="post">
+    <form id="the_form" method="post">
         <div>
             <p><span class="instructions">Instructions:</span></p>
             <ol>
@@ -45,9 +60,12 @@
             <textarea class="ip_addresses" name="ip_addresses" id="ip_addresses"></textarea>
         </div>
         <div id="std_buttons">
-            <button id="submit" form="the_form" type="submit">Submit</button> <button id="reset" type="reset" form="the_form" value="reset">Reset</button>
+            <input id="submit" form="the_form" type="button" value="Submit" onclick="check_ips()"/> <button id="reset" type="reset" form="the_form" value="reset">Reset</button>
         </div>
     </form>
+</div>
+<div>
+    <p id="results"></p>
 </div>
 </body>
 </html>
